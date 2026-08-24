@@ -1,0 +1,10 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-conf: #7c3aed;
+  --color-conf-soft: #ede9fe;
+}
+
+body {
+  @apply bg-zinc-50 text-zinc-900 antialiased;
+}
