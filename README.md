@@ -34,6 +34,19 @@ npm test        # testes unitários
 npm run e2e     # e2e (antes, uma vez: npx playwright install chromium)
 ```
 
+## Atalhos usados no curso
+
+As aulas são gravadas no macOS. No Windows e no Linux, a regra geral é trocar `Cmd` por `Ctrl`:
+
+| Ação | macOS | Windows / Linux |
+|------|-------|-----------------|
+| Aceitar sugestão do Tab | `Tab` | `Tab` |
+| Aceitar sugestão palavra a palavra | `Cmd + →` | `Ctrl + →` |
+| Descartar sugestão | `Esc` | `Esc` |
+| Edição inline (editor e terminal) | `Cmd + K` | `Ctrl + K` |
+
+Se algum atalho não bater com a sua instalação, confira em Settings → Keyboard Shortcuts no próprio Cursor — os atalhos podem mudar entre versões.
+
 ## Estrutura
 
 ```
