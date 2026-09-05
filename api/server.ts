@@ -1,6 +1,7 @@
+import 'dotenv/config'
 import express from 'express'
 import cors from 'cors'
-import { listarPalestras, buscarPalestra, palestras } from './dados'
+import { repo } from './repositorio'
 import { criarInscricao, listarInscricoesPorEmail, fazerCheckin, ErroInscricao } from './inscricoes'
 import { haConflitoDeSala } from './alocacao'
 
@@ -8,12 +9,12 @@ const app = express()
 app.use(cors())
 app.use(express.json())
 
-app.get('/api/palestras', (_req, res) => {
-  res.json(listarPalestras())
+app.get('/api/palestras', async (_req, res) => {
+  res.json(await repo.listarPalestras())
 })
 
-app.get('/api/palestras/:id', (req, res) => {
-  const palestra = buscarPalestra(req.params.id)
+app.get('/api/palestras/:id', async (req, res) => {
+  const palestra = await repo.buscarPalestra(req.params.id)
   if (!palestra) {
     res.status(404).json({ erro: 'Palestra não encontrada' })
     return
@@ -21,23 +22,21 @@ app.get('/api/palestras/:id', (req, res) => {
   res.json(palestra)
 })
 
-app.put('/api/palestras/:id/remanejar', (req, res) => {
-  const palestra = buscarPalestra(req.params.id)
+app.put('/api/palestras/:id/remanejar', async (req, res) => {
+  const palestra = await repo.buscarPalestra(req.params.id)
   if (!palestra) {
     res.status(404).json({ erro: 'Palestra não encontrada' })
     return
   }
   const { sala, inicio, fim } = req.body
-  const conflito = haConflitoDeSala(palestras, { sala, inicio, fim }, palestra.id)
+  const todas = await repo.listarPalestras()
+  const conflito = haConflitoDeSala(todas, { sala, inicio, fim }, palestra.id)
   if (conflito) {
     res.status(409).json({ erro: `Conflito com "${conflito.titulo}" na ${sala}` })
     return
   }
-  palestra.remanejadaDe = palestra.inicio
-  palestra.sala = sala
-  palestra.inicio = inicio
-  palestra.fim = fim
-  res.json(palestra)
+  await repo.atualizarPalestra(palestra.id, { remanejadaDe: palestra.inicio, sala, inicio, fim })
+  res.json(await repo.buscarPalestra(palestra.id))
 })
 
 app.post('/api/inscricoes', async (req, res) => {
@@ -59,17 +58,17 @@ app.post('/api/inscricoes', async (req, res) => {
   }
 })
 
-app.get('/api/inscricoes', (req, res) => {
+app.get('/api/inscricoes', async (req, res) => {
   const email = String(req.query.email ?? '')
   if (!email) {
     res.status(400).json({ erro: 'Informe o e-mail' })
     return
   }
-  res.json(listarInscricoesPorEmail(email))
+  res.json(await listarInscricoesPorEmail(email))
 })
 
-app.post('/api/checkin', (req, res) => {
-  const inscricao = fazerCheckin(req.body.inscricaoId)
+app.post('/api/checkin', async (req, res) => {
+  const inscricao = await fazerCheckin(req.body.inscricaoId)
   if (!inscricao) {
     res.status(404).json({ erro: 'Inscrição não encontrada' })
     return

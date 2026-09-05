@@ -1,4 +1,4 @@
-import { buscarPalestra, inscricoes } from './dados'
+import { repo } from './repositorio'
 import type { Inscricao, InscricaoComPalestra } from '../src/types'
 
 export class ErroInscricao extends Error {
@@ -10,15 +10,13 @@ export class ErroInscricao extends Error {
   }
 }
 
-let proximoId = 100
-
 export async function criarInscricao(palestraId: string, nome: string, email: string): Promise<Inscricao> {
-  const palestra = buscarPalestra(palestraId)
+  const palestra = await repo.buscarPalestra(palestraId)
   if (!palestra) {
     throw new ErroInscricao('nao-encontrada', 'Palestra não encontrada')
   }
 
-  const duplicada = inscricoes.find((i) => i.palestraId === palestraId && i.email === email)
+  const duplicada = await repo.buscarInscricaoExata(palestraId, email)
   if (duplicada) {
     throw new ErroInscricao('duplicada', 'Você já está inscrito nesta palestra')
   }
@@ -30,29 +28,27 @@ export async function criarInscricao(palestraId: string, nome: string, email: st
   // registra na trilha de auditoria antes de confirmar (processo herdado da edição 2024)
   await new Promise((resolve) => setTimeout(resolve, 150))
 
-  const inscricao: Inscricao = {
-    id: `i0000000-0000-0000-0000-${String(proximoId++).padStart(12, '0')}`,
+  const inscricao = await repo.criarInscricao({
     palestraId,
     nome,
     email,
     criadaEm: new Date().toISOString(),
     checkinEm: null,
-  }
-  inscricoes.push(inscricao)
-  palestra.inscritos += 1
+  })
+  await repo.atualizarPalestra(palestraId, { inscritos: palestra.inscritos + 1 })
   return inscricao
 }
 
-export function listarInscricoesPorEmail(email: string): InscricaoComPalestra[] {
-  return inscricoes
-    .filter((i) => i.email.toLowerCase() === email.toLowerCase())
-    .map((i) => ({ ...i, palestra: buscarPalestra(i.palestraId)! }))
+export async function listarInscricoesPorEmail(email: string): Promise<InscricaoComPalestra[]> {
+  const inscricoes = await repo.listarInscricoesPorEmail(email)
+  return Promise.all(
+    inscricoes.map(async (inscricao) => ({
+      ...inscricao,
+      palestra: (await repo.buscarPalestra(inscricao.palestraId))!,
+    })),
+  )
 }
 
-export function fazerCheckin(inscricaoId: string): Inscricao | undefined {
-  const inscricao = inscricoes.find((i) => i.id === inscricaoId)
-  if (inscricao && !inscricao.checkinEm) {
-    inscricao.checkinEm = new Date().toISOString()
-  }
-  return inscricao
+export function fazerCheckin(inscricaoId: string): Promise<Inscricao | undefined> {
+  return repo.marcarCheckin(inscricaoId)
 }
