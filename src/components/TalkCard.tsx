@@ -25,7 +25,7 @@ export function TalkCard({ palestra }: { palestra: Palestra }) {
         <CardContent className="flex items-center gap-4 text-sm text-zinc-600">
           <span className="font-medium">
             {palestra.remanejadaDe && (
-              <span className="mr-1 text-zinc-400">{formatarHora(palestra.remanejadaDe)}</span>
+              <span className="mr-1 text-zinc-400 line-through">{formatarHora(palestra.remanejadaDe)}</span>
             )}
             {formatarHora(palestra.inicio)}
           </span>
