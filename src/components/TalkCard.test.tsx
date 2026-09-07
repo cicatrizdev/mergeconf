@@ -35,4 +35,12 @@ describe('TalkCard', () => {
     render(<TalkCard palestra={palestra} />, { wrapper: MemoryRouter })
     expect(screen.getByRole('link')).toHaveAttribute('href', `/palestra/${palestra.id}`)
   })
+
+  it('risca o horário antigo de talks remanejadas', () => {
+    render(<TalkCard palestra={{ ...palestra, remanejadaDe: '2026-10-24T14:00:00-03:00' }} />, {
+      wrapper: MemoryRouter,
+    })
+    expect(screen.getByText('14h00')).toHaveClass('line-through')
+    expect(screen.getByText('10h30')).not.toHaveClass('line-through')
+  })
 })

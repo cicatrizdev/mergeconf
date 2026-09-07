@@ -33,7 +33,7 @@ export function PalestraDetalhe() {
         <span className="inline-flex items-center gap-1.5">
           <Clock className="size-4" aria-hidden />
           {palestra.remanejadaDe && (
-            <span className="text-zinc-400">{formatarHora(palestra.remanejadaDe)}</span>
+            <span className="text-zinc-400 line-through">{formatarHora(palestra.remanejadaDe)}</span>
           )}
           {formatarHora(palestra.inicio)} · {formatarDuracao(palestra.inicio, palestra.fim)}
         </span>
