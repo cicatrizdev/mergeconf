@@ -1,9 +1,18 @@
 import type { Inscricao, InscricaoComPalestra, Palestra } from '../types'
 
+export class ErroApi extends Error {
+  constructor(
+    mensagem: string,
+    public codigo?: string,
+  ) {
+    super(mensagem)
+  }
+}
+
 async function json<T>(res: Response): Promise<T> {
   if (!res.ok) {
     const corpo = await res.json().catch(() => ({}))
-    throw new Error(corpo.erro ?? `Erro ${res.status}`)
+    throw new ErroApi(corpo.erro ?? `Erro ${res.status}`, corpo.codigo)
   }
   return res.json()
 }

@@ -10,13 +10,19 @@ export class ErroInscricao extends Error {
   }
 }
 
+function normalizarEmail(email: string): string {
+  return email.trim().toLowerCase()
+}
+
 export async function criarInscricao(palestraId: string, nome: string, email: string): Promise<Inscricao> {
+  const emailNormalizado = normalizarEmail(email)
+
   const palestra = await repo.buscarPalestra(palestraId)
   if (!palestra) {
     throw new ErroInscricao('nao-encontrada', 'Palestra não encontrada')
   }
 
-  const duplicada = await repo.buscarInscricaoExata(palestraId, email)
+  const duplicada = await repo.buscarInscricaoExata(palestraId, emailNormalizado)
   if (duplicada) {
     throw new ErroInscricao('duplicada', 'Você já está inscrito nesta palestra')
   }
@@ -31,7 +37,7 @@ export async function criarInscricao(palestraId: string, nome: string, email: st
   const inscricao = await repo.criarInscricao({
     palestraId,
     nome,
-    email,
+    email: emailNormalizado,
     criadaEm: new Date().toISOString(),
     checkinEm: null,
   })
@@ -40,7 +46,7 @@ export async function criarInscricao(palestraId: string, nome: string, email: st
 }
 
 export async function listarInscricoesPorEmail(email: string): Promise<InscricaoComPalestra[]> {
-  const inscricoes = await repo.listarInscricoesPorEmail(email)
+  const inscricoes = await repo.listarInscricoesPorEmail(normalizarEmail(email))
   return Promise.all(
     inscricoes.map(async (inscricao) => ({
       ...inscricao,

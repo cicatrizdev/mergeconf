@@ -20,7 +20,9 @@ export function criarRepositorioMemoria(): Repositorio {
     },
 
     async buscarInscricaoExata(palestraId: string, email: string) {
-      return inscricoes.find((i) => i.palestraId === palestraId && i.email === email)
+      return inscricoes.find(
+        (i) => i.palestraId === palestraId && i.email.toLowerCase() === email.toLowerCase(),
+      )
     },
 
     async listarInscricoesPorEmail(email: string) {
