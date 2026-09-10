@@ -82,14 +82,17 @@ export function criarRepositorioSupabase(url: string, chave: string): Repositori
     },
 
     async buscarInscricaoExata(palestraId: string, email: string) {
+      // ilike + limit(1): case-insensitive e tolerante a duplicatas legadas
+      // criadas antes da normalização (maybeSingle estouraria com 2 linhas)
       const { data, error } = await supabase
         .from('inscricoes')
         .select('*')
         .eq('palestra_id', palestraId)
-        .eq('email', email)
-        .maybeSingle()
+        .ilike('email', email)
+        .limit(1)
       if (error) throw new Error(`Supabase: ${error.message}`)
-      return data ? paraInscricao(data as LinhaInscricao) : undefined
+      const linha = (data as LinhaInscricao[])[0]
+      return linha ? paraInscricao(linha) : undefined
     },
 
     async listarInscricoesPorEmail(email: string) {

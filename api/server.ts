@@ -41,7 +41,7 @@ app.put('/api/palestras/:id/remanejar', async (req, res) => {
 
 app.post('/api/inscricoes', async (req, res) => {
   const { palestraId, nome, email } = req.body
-  if (!palestraId || !nome || !email) {
+  if (!palestraId || !nome || !String(email ?? '').trim()) {
     res.status(400).json({ erro: 'palestraId, nome e email são obrigatórios' })
     return
   }
