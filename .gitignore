@@ -12,3 +12,6 @@ docs/
 
 # Config local do Claude Code
 .claude/
+
+# Cache do Supabase CLI
+supabase/.temp/

@@ -43,7 +43,7 @@ export function PalestraDetalhe() {
         </span>
         <span className="inline-flex items-center gap-1.5">
           <Users className="size-4" aria-hidden />
-          {vagasRestantes} de {palestra.vagas} vagas
+          {vagasRestantes <= 0 ? 'Lotada · lista de espera' : `${vagasRestantes} de ${palestra.vagas} vagas`}
         </span>
       </div>
 

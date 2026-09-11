@@ -35,7 +35,7 @@ export function TalkCard({ palestra }: { palestra: Palestra }) {
           </span>
           <span className="ml-auto inline-flex items-center gap-1">
             <Users className="size-3.5" aria-hidden />
-            {vagasRestantes} vagas
+            {vagasRestantes <= 0 ? 'Lotada' : `${vagasRestantes} vagas`}
           </span>
         </CardContent>
       </Card>

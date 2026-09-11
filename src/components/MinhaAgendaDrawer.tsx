@@ -1,6 +1,8 @@
 import { X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { BadgeStatusInscricao } from './BadgeStatusInscricao'
 import { useAgenda } from '../hooks/useAgenda'
+import { cancelarInscricao, ErroApi } from '../lib/api'
 import { duracaoEmMinutos, formatarHora } from '../lib/format'
 
 export function MinhaAgendaDrawer({ aberto, onFechar }: { aberto: boolean; onFechar: () => void }) {
@@ -8,8 +10,17 @@ export function MinhaAgendaDrawer({ aberto, onFechar }: { aberto: boolean; onFec
 
   const totalHoras =
     agenda
-      .filter((p) => p.tipo === 'talk')
-      .reduce((total, p) => total + duracaoEmMinutos(p.inicio, p.fim), 0) / 60
+      .filter((item) => item.palestra.tipo === 'talk')
+      .reduce((total, item) => total + duracaoEmMinutos(item.palestra.inicio, item.palestra.fim), 0) / 60
+
+  async function cancelar(inscricaoId: string, palestraId: string) {
+    try {
+      await cancelarInscricao(inscricaoId)
+    } catch (erro) {
+      if (!(erro instanceof ErroApi && erro.codigo === 'nao-encontrada')) return
+    }
+    remover(palestraId)
+  }
 
   if (!aberto) return null
 
@@ -29,20 +40,32 @@ export function MinhaAgendaDrawer({ aberto, onFechar }: { aberto: boolean; onFec
           </p>
         ) : (
           <ul className="flex flex-col gap-3">
-            {agenda.map((palestra) => (
+            {agenda.map(({ palestra, inscricaoId, status }) => (
               <li key={palestra.id} className="rounded-md border border-zinc-200 p-3">
-                <p className="text-sm font-medium">{palestra.titulo}</p>
+                <div className="flex items-center gap-2">
+                  <p className="text-sm font-medium">{palestra.titulo}</p>
+                  <BadgeStatusInscricao status={status} />
+                </div>
                 <p className="mt-1 text-xs text-zinc-500">
                   {formatarHora(palestra.inicio)} · {palestra.sala}
                 </p>
-                <button
-                  className="mt-2 text-xs text-red-600 hover:underline"
-                  onClick={() => {
-                    remover
-                  }}
-                >
-                  Remover da agenda
-                </button>
+                {inscricaoId ? (
+                  <button
+                    className="mt-2 text-xs text-red-600 hover:underline"
+                    onClick={() => cancelar(inscricaoId, palestra.id)}
+                  >
+                    {status === 'em-espera' ? 'Sair da fila' : 'Cancelar inscrição'}
+                  </button>
+                ) : (
+                  <button
+                    className="mt-2 text-xs text-red-600 hover:underline"
+                    onClick={() => {
+                      remover
+                    }}
+                  >
+                    Remover da agenda
+                  </button>
+                )}
               </li>
             ))}
           </ul>

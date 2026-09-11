@@ -29,7 +29,7 @@ export function criarRepositorioMemoria(): Repositorio {
       return inscricoes.filter((i) => i.email.toLowerCase() === email.toLowerCase())
     },
 
-    async criarInscricao(dados: Omit<Inscricao, 'id'>) {
+    async criarInscricao(dados: Omit<Inscricao, 'id' | 'posicaoFila'>) {
       const inscricao: Inscricao = {
         id: `i0000000-0000-0000-0000-${String(proximoId++).padStart(12, '0')}`,
         ...dados,
@@ -44,6 +44,27 @@ export function criarRepositorioMemoria(): Repositorio {
         inscricao.checkinEm = new Date().toISOString()
       }
       return inscricao
+    },
+
+    async buscarInscricao(id: string) {
+      return inscricoes.find((i) => i.id === id)
+    },
+
+    async listarFilaDaPalestra(palestraId: string) {
+      return inscricoes
+        .filter((i) => i.palestraId === palestraId && i.status === 'em-espera')
+        .sort((a, b) => a.criadaEm.localeCompare(b.criadaEm))
+    },
+
+    async atualizarInscricao(id: string, mudancas: Pick<Inscricao, 'status'>) {
+      const inscricao = inscricoes.find((i) => i.id === id)
+      if (inscricao) Object.assign(inscricao, mudancas)
+      return inscricao
+    },
+
+    async removerInscricao(id: string) {
+      const indice = inscricoes.findIndex((i) => i.id === id)
+      if (indice !== -1) inscricoes.splice(indice, 1)
     },
   }
 }

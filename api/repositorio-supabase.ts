@@ -24,6 +24,7 @@ interface LinhaInscricao {
   email: string
   criada_em: string
   checkin_em: string | null
+  status: Inscricao['status']
 }
 
 function paraPalestra(linha: LinhaPalestra): Palestra {
@@ -51,6 +52,7 @@ function paraInscricao(linha: LinhaInscricao): Inscricao {
     email: linha.email,
     criadaEm: linha.criada_em,
     checkinEm: linha.checkin_em,
+    status: linha.status,
   }
 }
 
@@ -101,7 +103,7 @@ export function criarRepositorioSupabase(url: string, chave: string): Repositori
       return (data as LinhaInscricao[]).map(paraInscricao)
     },
 
-    async criarInscricao(dados: Omit<Inscricao, 'id'>) {
+    async criarInscricao(dados: Omit<Inscricao, 'id' | 'posicaoFila'>) {
       const { data, error } = await supabase
         .from('inscricoes')
         .insert({
@@ -110,6 +112,7 @@ export function criarRepositorioSupabase(url: string, chave: string): Repositori
           email: dados.email,
           criada_em: dados.criadaEm,
           checkin_em: dados.checkinEm,
+          status: dados.status,
         })
         .select()
         .single()
@@ -133,6 +136,40 @@ export function criarRepositorioSupabase(url: string, chave: string): Repositori
         .eq('id', inscricaoId)
         .maybeSingle()
       return existente ? paraInscricao(existente as LinhaInscricao) : undefined
+    },
+
+    async buscarInscricao(id: string) {
+      const { data, error } = await supabase.from('inscricoes').select('*').eq('id', id).maybeSingle()
+      if (error) throw new Error(`Supabase: ${error.message}`)
+      return data ? paraInscricao(data as LinhaInscricao) : undefined
+    },
+
+    async listarFilaDaPalestra(palestraId: string) {
+      const { data, error } = await supabase
+        .from('inscricoes')
+        .select('*')
+        .eq('palestra_id', palestraId)
+        .eq('status', 'em-espera')
+        .order('criada_em')
+        .order('id')
+      if (error) throw new Error(`Supabase: ${error.message}`)
+      return (data as LinhaInscricao[]).map(paraInscricao)
+    },
+
+    async atualizarInscricao(id: string, mudancas: Pick<Inscricao, 'status'>) {
+      const { data, error } = await supabase
+        .from('inscricoes')
+        .update({ status: mudancas.status })
+        .eq('id', id)
+        .select()
+        .maybeSingle()
+      if (error) throw new Error(`Supabase: ${error.message}`)
+      return data ? paraInscricao(data as LinhaInscricao) : undefined
+    },
+
+    async removerInscricao(id: string) {
+      const { error } = await supabase.from('inscricoes').delete().eq('id', id)
+      if (error) throw new Error(`Supabase: ${error.message}`)
     },
   }
 }
