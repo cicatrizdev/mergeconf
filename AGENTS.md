@@ -1,6 +1,6 @@
-arquivo contendo regras a nivel de projeto para consulta dos agents
+Regras do projeto estão em `.cursor/rules/`.
 
-- regra backend:
-  - em arquivos typescript
-    - nunca utilize "any""
-    - prefira sempre named export
+- `projeto.mdc` — núcleo (sempre)
+- `frontend.mdc` — `src/`
+- `backend.mdc` — `api/`
+- `testes.mdc` — Vitest e Playwright

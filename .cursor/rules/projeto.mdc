@@ -1,0 +1,17 @@
+---
+description: Núcleo do MergeConf — stack, domínio, exports e tipos
+alwaysApply: true
+---
+
+# MergeConf
+
+App da conferência: grade, inscrições, check-in e organizador.
+
+**Stack:** React 19, Vite, TypeScript, Tailwind 4, React Router 7, Express, Supabase, Vitest, Playwright.
+
+- Domínio em português: identificadores, tipos, mensagens e nomes de teste (`criarInscricao`, `palestraId`, `em-espera`).
+- Tipar com o domínio ou `unknown` + narrowing. Sem `any`.
+- Named export. Exceções: `App.tsx` e configs (`vite.config.ts`, `playwright.config.ts`).
+- Tipos de domínio em `src/types.ts`. A API importa de lá. Não duplicar `Palestra` / `Inscricao`.
+- Diff mínimo: não reformatar imports nem limpar arquivo fora do pedido.
+- Não introduzir lib ou arquitetura nova sem pedido explícito.
