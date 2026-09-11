@@ -1,0 +1,29 @@
+---
+description: React, Tailwind e client HTTP em src/
+globs: src/**/*.{ts,tsx}
+alwaysApply: false
+---
+
+# Frontend
+
+- Componente função + named export. Estado com `useState` ou hook existente (`useAgenda`).
+- HTTP só via `src/lib/api.ts` (`ErroApi`, `json`, `semCorpo`).
+- Tailwind + `cn()`. Reutilizar `components/ui`. Ícone decorativo com `aria-hidden`.
+- `@/` ao cruzar pastas de `src/`. Relativo no mesmo diretório e em teste colocalizado. Não reescrever import só por estilo.
+- Early return no render. Sem `memo` / `useMemo` / `useCallback` sem motivo. Sem lib de data-fetching.
+
+```tsx
+// ❌
+fetch(`/api/palestras/${id}`).then(...)
+
+// ✅
+import { buscarPalestra } from '../lib/api'
+
+export function PalestraDetalhe() {
+  const [palestra, setPalestra] = useState<Palestra | null>(null)
+  useEffect(() => {
+    if (id) buscarPalestra(id).then(setPalestra)
+  }, [id])
+  if (!palestra) return null
+}
+```

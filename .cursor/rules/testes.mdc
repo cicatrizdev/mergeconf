@@ -1,0 +1,25 @@
+---
+description: Vitest colocalizado e Playwright em e2e/
+globs: "**/*.{test,spec}.{ts,tsx}"
+alwaysApply: false
+---
+
+# Testes
+
+- Colocalizar (`foo.test.ts` ao lado de `foo.ts`). Playwright só em `e2e/`.
+- `it('...')` em português, um comportamento por teste. Happy path e borda (e-mail com maiúscula, lotada, duplicata).
+- Mockar só I/O. API do front: `importOriginal` + `vi.mocked`. Sem `as any` em mock.
+- Teste de `api/` contra memória: desfazer mutação de `dados.ts` no `afterEach`.
+- e2e: `getByRole` / `getByText`, fluxo de fumaça. Sem seletor por classe CSS.
+
+```ts
+// ❌
+;(inscrever as any).mockResolvedValue(inscricao)
+
+// ✅
+vi.mock('../lib/api', async (importOriginal) => {
+  const original = await importOriginal<typeof import('../lib/api')>()
+  return { ...original, inscrever: vi.fn() }
+})
+vi.mocked(inscrever).mockResolvedValue(inscricao)
+```

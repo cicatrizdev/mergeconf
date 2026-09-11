@@ -1,0 +1,28 @@
+---
+description: Express, regras de inscrição e repositório em api/
+globs: api/**/*.ts
+alwaysApply: false
+---
+
+# Backend
+
+- Rota fina: validar input → early return → `inscricoes` / `alocacao` → `repo`.
+- Erro de domínio: `ErroInscricao` + `responderErroInscricao` (`404` / `409`, corpo `{ erro, codigo }`).
+- Persistência só pela interface `Repositorio`. snake_case só na borda do Supabase (`paraPalestra` / `paraInscricao`).
+- Tipos de `src/types.ts`. Linha de banco com tipo próprio (`LinhaPalestra`), sem `any`.
+- Em listagem, não introduzir N+1 novo se o repo já puder resolver em lote.
+
+```ts
+// ❌ regra de negócio na rota
+app.post('/api/inscricoes', async (req, res) => {
+  const palestra = await repo.buscarPalestra(req.body.palestraId)
+  if (palestra.inscritos >= palestra.vagas) { /* ... */ }
+})
+
+// ✅
+if (!palestraId || !nome || !String(email ?? '').trim()) {
+  res.status(400).json({ erro: 'palestraId, nome e email são obrigatórios' })
+  return
+}
+const inscricao = await criarInscricao(palestraId, nome, email)
+```

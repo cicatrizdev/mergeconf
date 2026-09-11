@@ -1,6 +1,0 @@
----
-alwaysApply: true
----
-
-- Nunca utilize o tipo "any" em arquivos typescript para tipar qualquer que seja a função/objeto
-- Utilize o named-export ao invés da convenção com "../../../" etc e suas variações
