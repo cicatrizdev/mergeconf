@@ -17,6 +17,8 @@ export interface Palestra {
   descricao: string
 }
 
+export type StatusInscricao = 'confirmada' | 'em-espera'
+
 export interface Inscricao {
   id: string
   palestraId: string
@@ -24,6 +26,8 @@ export interface Inscricao {
   email: string
   criadaEm: string
   checkinEm: string | null
+  status: StatusInscricao
+  posicaoFila?: number
 }
 
 export interface InscricaoComPalestra extends Inscricao {

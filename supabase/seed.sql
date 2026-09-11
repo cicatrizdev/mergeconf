@@ -15,7 +15,7 @@ insert into palestras (id, titulo, palestrante, sala, trilha, tipo, inicio, fim,
   ('00000000-0000-0000-0000-000000000011', 'Kubernetes: O Cluster que Ninguém Sabe Quem Criou', 'Helena Helm', 'Auditório Legacy', 'backend', 'talk', '2026-10-24T16:00:00-03', '2026-10-24T16:45:00-03', 30, 29, null, 'Arqueologia de infraestrutura: entendendo um cluster herdado onde todo manifesto tem um "não mexer" no comentário. Sala pequena, corre que está acabando.'),
   ('00000000-0000-0000-0000-000000000012', 'Acessibilidade: O Requisito que Virou Lenda', 'Alice Aria', 'Sala Rubber Duck', 'frontend', 'talk', '2026-10-24T17:00:00-03', '2026-10-24T17:45:00-03', 60, 21, '2026-10-24T09:00:00-03', 'Todo mundo diz que é prioridade, ninguém coloca na sprint. Como sair do discurso e fazer um formulário que uma pessoa cega consegue enviar.');
 
-insert into inscricoes (palestra_id, nome, email, criada_em) values
-  ('00000000-0000-0000-0000-000000000002', 'Ana Dev', 'ana@exemplo.dev', '2026-08-20T10:12:00-03'),
-  ('00000000-0000-0000-0000-000000000006', 'Ana Dev', 'ana@exemplo.dev', '2026-08-20T10:13:00-03'),
-  ('00000000-0000-0000-0000-000000000011', 'Bruno Backend', 'bruno@exemplo.dev', '2026-08-21T15:40:00-03');
+insert into inscricoes (palestra_id, nome, email, criada_em, status) values
+  ('00000000-0000-0000-0000-000000000002', 'Ana Dev', 'ana@exemplo.dev', '2026-08-20T10:12:00-03', 'confirmada'),
+  ('00000000-0000-0000-0000-000000000006', 'Ana Dev', 'ana@exemplo.dev', '2026-08-20T10:13:00-03', 'confirmada'),
+  ('00000000-0000-0000-0000-000000000011', 'Bruno Backend', 'bruno@exemplo.dev', '2026-08-21T15:40:00-03', 'confirmada');

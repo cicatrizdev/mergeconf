@@ -8,8 +8,12 @@ export interface Repositorio {
   atualizarPalestra(id: string, mudancas: Partial<Palestra>): Promise<void>
   buscarInscricaoExata(palestraId: string, email: string): Promise<Inscricao | undefined>
   listarInscricoesPorEmail(email: string): Promise<Inscricao[]>
-  criarInscricao(inscricao: Omit<Inscricao, 'id'>): Promise<Inscricao>
+  criarInscricao(inscricao: Omit<Inscricao, 'id' | 'posicaoFila'>): Promise<Inscricao>
   marcarCheckin(inscricaoId: string): Promise<Inscricao | undefined>
+  buscarInscricao(id: string): Promise<Inscricao | undefined>
+  listarFilaDaPalestra(palestraId: string): Promise<Inscricao[]>
+  atualizarInscricao(id: string, mudancas: Pick<Inscricao, 'status'>): Promise<Inscricao | undefined>
+  removerInscricao(id: string): Promise<void>
 }
 
 function criarRepositorio(): Repositorio {

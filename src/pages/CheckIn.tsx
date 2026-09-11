@@ -2,7 +2,8 @@ import { useState } from 'react'
 import { CheckCircle2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { buscarInscricoes, fazerCheckin } from '../lib/api'
+import { BadgeStatusInscricao } from '../components/BadgeStatusInscricao'
+import { buscarInscricoes, cancelarInscricao, fazerCheckin } from '../lib/api'
 import { formatarHora } from '../lib/format'
 import type { InscricaoComPalestra } from '../types'
 
@@ -16,6 +17,11 @@ export function CheckIn() {
 
   async function checkin(inscricaoId: string) {
     await fazerCheckin(inscricaoId)
+    await buscar()
+  }
+
+  async function cancelar(id: string) {
+    await cancelarInscricao(id)
     await buscar()
   }
 
@@ -55,20 +61,32 @@ export function CheckIn() {
               className="flex items-center justify-between rounded-md border border-zinc-200 bg-white p-4"
             >
               <div>
-                <p className="font-medium">{inscricao.palestra.titulo}</p>
+                <div className="flex items-center gap-2">
+                  <p className="font-medium">{inscricao.palestra.titulo}</p>
+                  <BadgeStatusInscricao status={inscricao.status} posicaoFila={inscricao.posicaoFila} />
+                </div>
                 <p className="mt-0.5 text-sm text-zinc-500">
                   {formatarHora(inscricao.palestra.inicio)} · {inscricao.palestra.sala}
                 </p>
               </div>
-              {inscricao.checkinEm ? (
+              {inscricao.status === 'em-espera' ? (
+                <Button variant="outline" onClick={() => cancelar(inscricao.id)}>
+                  Sair da fila
+                </Button>
+              ) : inscricao.checkinEm ? (
                 <span className="inline-flex items-center gap-1.5 text-sm font-medium text-emerald-600">
                   <CheckCircle2 className="size-4" aria-hidden />
                   Presente
                 </span>
               ) : (
-                <Button variant="outline" onClick={() => checkin(inscricao.id)}>
-                  Check-in
-                </Button>
+                <div className="flex items-center gap-2">
+                  <Button variant="outline" onClick={() => checkin(inscricao.id)}>
+                    Check-in
+                  </Button>
+                  <Button variant="ghost" className="text-red-600" onClick={() => cancelar(inscricao.id)}>
+                    Cancelar inscrição
+                  </Button>
+                </div>
               )}
             </li>
           ))}

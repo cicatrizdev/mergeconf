@@ -43,4 +43,9 @@ describe('TalkCard', () => {
     expect(screen.getByText('14h00')).toHaveClass('line-through')
     expect(screen.getByText('10h30')).not.toHaveClass('line-through')
   })
+
+  it('mostra "Lotada" quando não há vagas', () => {
+    render(<TalkCard palestra={{ ...palestra, inscritos: palestra.vagas }} />, { wrapper: MemoryRouter })
+    expect(screen.getByText('Lotada')).toBeInTheDocument()
+  })
 })

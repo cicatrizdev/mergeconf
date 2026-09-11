@@ -2,12 +2,24 @@ import 'dotenv/config'
 import express from 'express'
 import cors from 'cors'
 import { repo } from './repositorio'
-import { criarInscricao, listarInscricoesPorEmail, fazerCheckin, ErroInscricao } from './inscricoes'
+import {
+  cancelarInscricao,
+  criarInscricao,
+  listarInscricoesPorEmail,
+  fazerCheckin,
+  ErroInscricao,
+} from './inscricoes'
 import { haConflitoDeSala } from './alocacao'
 
 const app = express()
 app.use(cors())
 app.use(express.json())
+
+function responderErroInscricao(res: express.Response, erro: unknown) {
+  if (!(erro instanceof ErroInscricao)) throw erro
+  const status = erro.codigo === 'nao-encontrada' ? 404 : 409
+  res.status(status).json({ erro: erro.message, codigo: erro.codigo })
+}
 
 app.get('/api/palestras', async (_req, res) => {
   res.json(await repo.listarPalestras())
@@ -49,12 +61,16 @@ app.post('/api/inscricoes', async (req, res) => {
     const inscricao = await criarInscricao(palestraId, nome, email)
     res.status(201).json(inscricao)
   } catch (erro) {
-    if (erro instanceof ErroInscricao) {
-      const status = erro.codigo === 'nao-encontrada' ? 404 : 409
-      res.status(status).json({ erro: erro.message, codigo: erro.codigo })
-      return
-    }
-    throw erro
+    responderErroInscricao(res, erro)
+  }
+})
+
+app.delete('/api/inscricoes/:id', async (req, res) => {
+  try {
+    await cancelarInscricao(req.params.id)
+    res.status(204).end()
+  } catch (erro) {
+    responderErroInscricao(res, erro)
   }
 })
 
@@ -68,12 +84,16 @@ app.get('/api/inscricoes', async (req, res) => {
 })
 
 app.post('/api/checkin', async (req, res) => {
-  const inscricao = await fazerCheckin(req.body.inscricaoId)
-  if (!inscricao) {
-    res.status(404).json({ erro: 'Inscrição não encontrada' })
-    return
+  try {
+    const inscricao = await fazerCheckin(req.body.inscricaoId)
+    if (!inscricao) {
+      res.status(404).json({ erro: 'Inscrição não encontrada' })
+      return
+    }
+    res.json(inscricao)
+  } catch (erro) {
+    responderErroInscricao(res, erro)
   }
-  res.json(inscricao)
 })
 
 const porta = Number(process.env.API_PORT ?? 3434)

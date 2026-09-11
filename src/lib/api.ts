@@ -17,6 +17,13 @@ async function json<T>(res: Response): Promise<T> {
   return res.json()
 }
 
+async function semCorpo(res: Response): Promise<void> {
+  if (!res.ok) {
+    const corpo = await res.json().catch(() => ({}))
+    throw new ErroApi(corpo.erro ?? `Erro ${res.status}`, corpo.codigo)
+  }
+}
+
 export function listarPalestras(): Promise<Palestra[]> {
   return fetch('/api/palestras').then((res) => json<Palestra[]>(res))
 }
@@ -45,4 +52,8 @@ export function fazerCheckin(inscricaoId: string): Promise<Inscricao> {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ inscricaoId }),
   }).then((res) => json<Inscricao>(res))
+}
+
+export function cancelarInscricao(inscricaoId: string): Promise<void> {
+  return fetch(`/api/inscricoes/${inscricaoId}`, { method: 'DELETE' }).then(semCorpo)
 }

@@ -1,7 +1,15 @@
 import { type HTMLAttributes } from 'react'
 import { cn } from '@/lib/utils'
 
-type Variante = 'default' | 'frontend' | 'backend' | 'ia' | 'carreira' | 'neutro'
+type Variante =
+  | 'default'
+  | 'frontend'
+  | 'backend'
+  | 'ia'
+  | 'carreira'
+  | 'neutro'
+  | 'confirmada'
+  | 'espera'
 
 const variantes: Record<Variante, string> = {
   default: 'bg-conf-soft text-conf',
@@ -10,6 +18,8 @@ const variantes: Record<Variante, string> = {
   ia: 'bg-violet-100 text-violet-700',
   carreira: 'bg-amber-100 text-amber-700',
   neutro: 'bg-zinc-100 text-zinc-600',
+  confirmada: 'bg-emerald-100 text-emerald-700',
+  espera: 'bg-orange-100 text-orange-700',
 }
 
 interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {

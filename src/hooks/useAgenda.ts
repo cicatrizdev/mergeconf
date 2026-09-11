@@ -1,22 +1,34 @@
 import { useCallback, useSyncExternalStore } from 'react'
-import type { Palestra } from '../types'
+import type { Inscricao, Palestra, StatusInscricao } from '../types'
+
+export type ItemAgenda = {
+  palestra: Palestra
+  inscricaoId?: string
+  status: StatusInscricao
+}
 
 const CHAVE = 'mergeconf:agenda'
 const ouvintes = new Set<() => void>()
-let cache: Palestra[] | null = null
+let cache: ItemAgenda[] | null = null
 
-function lerAgenda(): Palestra[] {
+function normalizarItem(item: ItemAgenda | Palestra): ItemAgenda {
+  if ('palestra' in item) return item
+  return { palestra: item, status: 'confirmada' }
+}
+
+function lerAgenda(): ItemAgenda[] {
   if (cache === null) {
     try {
-      cache = JSON.parse(localStorage.getItem(CHAVE) ?? '[]')
+      const bruto = JSON.parse(localStorage.getItem(CHAVE) ?? '[]') as Array<ItemAgenda | Palestra>
+      cache = bruto.map(normalizarItem)
     } catch {
       cache = []
     }
   }
-  return cache!
+  return cache
 }
 
-function gravarAgenda(agenda: Palestra[]) {
+function gravarAgenda(agenda: ItemAgenda[]) {
   cache = agenda
   localStorage.setItem(CHAVE, JSON.stringify(agenda))
   ouvintes.forEach((avisar) => avisar())
@@ -30,16 +42,32 @@ function assinar(avisar: () => void) {
 export function useAgenda() {
   const agenda = useSyncExternalStore(assinar, lerAgenda)
 
-  const adicionar = useCallback((palestra: Palestra) => {
+  const adicionar = useCallback((palestra: Palestra, inscricao?: Pick<Inscricao, 'id' | 'status'>) => {
     const atual = lerAgenda()
-    if (!atual.some((p) => p.id === palestra.id)) {
-      gravarAgenda([...atual, palestra])
+    if (!atual.some((item) => item.palestra.id === palestra.id)) {
+      gravarAgenda([
+        ...atual,
+        {
+          palestra,
+          inscricaoId: inscricao?.id,
+          status: inscricao?.status ?? 'confirmada',
+        },
+      ])
     }
   }, [])
 
+  const atualizar = useCallback(
+    (palestraId: string, mudancas: Partial<Pick<ItemAgenda, 'inscricaoId' | 'status'>>) => {
+      gravarAgenda(
+        lerAgenda().map((item) => (item.palestra.id === palestraId ? { ...item, ...mudancas } : item)),
+      )
+    },
+    [],
+  )
+
   const remover = useCallback((palestraId: string) => {
-    gravarAgenda(lerAgenda().filter((p) => p.id !== palestraId))
+    gravarAgenda(lerAgenda().filter((item) => item.palestra.id !== palestraId))
   }, [])
 
-  return { agenda, adicionar, remover }
+  return { agenda, adicionar, atualizar, remover }
 }

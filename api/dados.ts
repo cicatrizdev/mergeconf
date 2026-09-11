@@ -184,6 +184,7 @@ export const inscricoes: Inscricao[] = [
     email: 'ana@exemplo.dev',
     criadaEm: '2026-08-20T10:12:00-03:00',
     checkinEm: null,
+    status: 'confirmada',
   },
   {
     id: 'i0000000-0000-0000-0000-000000000002',
@@ -192,6 +193,7 @@ export const inscricoes: Inscricao[] = [
     email: 'ana@exemplo.dev',
     criadaEm: '2026-08-20T10:13:00-03:00',
     checkinEm: null,
+    status: 'confirmada',
   },
   {
     id: 'i0000000-0000-0000-0000-000000000003',
@@ -200,6 +202,7 @@ export const inscricoes: Inscricao[] = [
     email: 'bruno@exemplo.dev',
     criadaEm: '2026-08-21T15:40:00-03:00',
     checkinEm: null,
+    status: 'confirmada',
   },
 ]
 
