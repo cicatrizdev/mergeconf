@@ -83,6 +83,17 @@ export function criarRepositorioSupabase(url: string, chave: string): Repositori
       if (error) throw new Error(`Supabase: ${error.message}`)
     },
 
+    async reservarVaga(palestraId: string) {
+      const { data, error } = await supabase.rpc('reservar_vaga', { p_palestra_id: palestraId })
+      if (error) throw new Error(`Supabase: ${error.message}`)
+      return data === true
+    },
+
+    async liberarVaga(palestraId: string) {
+      const { error } = await supabase.rpc('liberar_vaga', { p_palestra_id: palestraId })
+      if (error) throw new Error(`Supabase: ${error.message}`)
+    },
+
     async buscarInscricaoExata(palestraId: string, email: string) {
       // ilike + limit(1): case-insensitive e tolerante a duplicatas legadas
       // criadas antes da normalização (maybeSingle estouraria com 2 linhas)
