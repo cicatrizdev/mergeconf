@@ -26,7 +26,8 @@ describe('criarInscricao', () => {
   afterEach(() => {
     // o repositório em memória muta os arrays de dados.ts; desfaz o que o teste criou
     for (let i = inscricoes.length - 1; i >= 0; i--) {
-      if (inscricoes[i].email.trim().toLowerCase() === EMAIL) inscricoes.splice(i, 1)
+      const email = inscricoes[i].email.trim().toLowerCase()
+      if (email === EMAIL || email.endsWith('@teste.dev')) inscricoes.splice(i, 1)
     }
     palestraDoTeste().inscritos = inscritosAntes
   })
@@ -59,6 +60,23 @@ describe('criarInscricao', () => {
     const doEmail = await listarInscricoesPorEmail('CASEY.TESTE@exemplo.dev')
     expect(doEmail).toHaveLength(1)
     expect(doEmail[0].palestra.id).toBe(PALESTRA_ID)
+  })
+
+  it('na corrida pela última vaga, só uma confirma e inscritos não passa do limite', async () => {
+    palestraDoTeste().inscritos = palestraDoTeste().vagas - 1
+
+    const resultados = await Promise.all([
+      criarInscricao(PALESTRA_ID, 'Ana Corrida', 'ana.corrida@teste.dev'),
+      criarInscricao(PALESTRA_ID, 'Bia Corrida', 'bia.corrida@teste.dev'),
+    ])
+
+    const statuses = resultados.map((r) => r.status).sort()
+    expect(statuses).toEqual(['confirmada', 'em-espera'])
+    expect(palestraDoTeste().inscritos).toBe(palestraDoTeste().vagas)
+    expect(palestraDoTeste().inscritos).toBeLessThanOrEqual(palestraDoTeste().vagas)
+
+    const emEspera = resultados.find((r) => r.status === 'em-espera')!
+    expect(emEspera.posicaoFila).toBe(1)
   })
 })
 

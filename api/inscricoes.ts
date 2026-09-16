@@ -38,33 +38,30 @@ export async function criarInscricao(palestraId: string, nome: string, email: st
     throw new ErroInscricao('duplicada', 'Você já está inscrito nesta palestra')
   }
 
-  const lotada = palestra.inscritos >= palestra.vagas
-
   // registra na trilha de auditoria antes de confirmar (processo herdado da edição 2024)
   await new Promise((resolve) => setTimeout(resolve, 150))
 
+  // reserva atômica: só uma corrida pela última vaga ganha a confirmação
+  const reservou = await repo.reservarVaga(palestraId)
   const inscricao = await repo.criarInscricao({
     palestraId,
     nome,
     email: emailNormalizado,
     criadaEm: new Date().toISOString(),
     checkinEm: null,
-    status: lotada ? 'em-espera' : 'confirmada',
+    status: reservou ? 'confirmada' : 'em-espera',
   })
-  if (lotada) return comPosicao(inscricao)
-  await repo.atualizarPalestra(palestraId, { inscritos: palestra.inscritos + 1 })
+  if (!reservou) return comPosicao(inscricao)
   return inscricao
 }
 
 export async function promoverPrimeiroDaFila(palestraId: string): Promise<Inscricao | undefined> {
-  const palestra = await repo.buscarPalestra(palestraId)
-  if (!palestra || palestra.inscritos >= palestra.vagas) return undefined
   const fila = await repo.listarFilaDaPalestra(palestraId)
   const primeira = fila[0]
   if (!primeira) return undefined
-  const promovida = await repo.atualizarInscricao(primeira.id, { status: 'confirmada' })
-  await repo.atualizarPalestra(palestraId, { inscritos: palestra.inscritos + 1 })
-  return promovida
+  const reservou = await repo.reservarVaga(palestraId)
+  if (!reservou) return undefined
+  return repo.atualizarInscricao(primeira.id, { status: 'confirmada' })
 }
 
 export async function cancelarInscricao(
@@ -80,10 +77,7 @@ export async function cancelarInscricao(
     return { removida: inscricao }
   }
 
-  const palestra = await repo.buscarPalestra(inscricao.palestraId)
-  if (palestra) {
-    await repo.atualizarPalestra(inscricao.palestraId, { inscritos: palestra.inscritos - 1 })
-  }
+  await repo.liberarVaga(inscricao.palestraId)
   const promovida = await promoverPrimeiroDaFila(inscricao.palestraId)
   return promovida ? { removida: inscricao, promovida } : { removida: inscricao }
 }

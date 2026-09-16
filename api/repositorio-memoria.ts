@@ -19,6 +19,18 @@ export function criarRepositorioMemoria(): Repositorio {
       if (palestra) Object.assign(palestra, mudancas)
     },
 
+    async reservarVaga(palestraId: string) {
+      const palestra = palestras.find((p) => p.id === palestraId)
+      if (!palestra || palestra.inscritos >= palestra.vagas) return false
+      palestra.inscritos += 1
+      return true
+    },
+
+    async liberarVaga(palestraId: string) {
+      const palestra = palestras.find((p) => p.id === palestraId)
+      if (palestra && palestra.inscritos > 0) palestra.inscritos -= 1
+    },
+
     async buscarInscricaoExata(palestraId: string, email: string) {
       return inscricoes.find(
         (i) => i.palestraId === palestraId && i.email.toLowerCase() === email.toLowerCase(),
