@@ -32,3 +32,27 @@ test.describe('grade no mobile', () => {
     await expect(page.getByRole('heading', { name: /Escalando o Monólito/ })).toBeVisible()
   })
 })
+
+test('Todas mostra keynote e palestra de frontend', async ({ page }) => {
+  await page.goto('/')
+  await expect(page.getByRole('radio', { name: 'Todas' })).toHaveAttribute('aria-pressed', 'true')
+  await expect(page.getByText('O Deploy de Sexta: Ao Vivo')).toBeVisible()
+  await expect(page.getByText('useEffect: Uma História de Terror')).toBeVisible()
+})
+
+test('filtra frontend na URL e esconde horários vazios', async ({ page }) => {
+  await page.goto('/')
+  await page.getByRole('radio', { name: 'frontend' }).click()
+
+  await expect(page).toHaveURL(/[?&]trilha=frontend/)
+  await expect(page.getByText('O Deploy de Sexta: Ao Vivo')).toHaveCount(0)
+  await expect(page.getByRole('heading', { name: '09h00' })).toHaveCount(0)
+  await expect(page.getByText('useEffect: Uma História de Terror')).toBeVisible()
+})
+
+test('abre a grade filtrada por ia a partir da URL', async ({ page }) => {
+  await page.goto('/?trilha=ia')
+  await expect(page.getByRole('radio', { name: 'ia' })).toHaveAttribute('aria-pressed', 'true')
+  await expect(page.getByText('Prompt Engineering: Falando Bonito com a Máquina')).toBeVisible()
+  await expect(page.getByText('O Deploy de Sexta: Ao Vivo')).toHaveCount(0)
+})
