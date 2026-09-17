@@ -14,7 +14,7 @@ export function GradeHorarios({ palestras }: { palestras: Palestra[] }) {
             <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-zinc-500">
               {formatarHora(horario)}
             </h2>
-            <div className="grid min-w-[720px] grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
               {sessoes.map((palestra) => (
                 <TalkCard key={palestra.id} palestra={palestra} />
               ))}
