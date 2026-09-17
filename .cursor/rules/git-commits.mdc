@@ -1,0 +1,23 @@
+---
+description: Autoria de commits e evidências em PRs
+alwaysApply: true
+---
+
+# Git e PRs
+
+## Autoria de commits
+
+- Nunca criar commits com identidade de agente Cursor (`Cursor Agent`, `cursoragent@…`, ou similar).
+- Usar somente `user.name` / `user.email` já configurados no ambiente e associados ao GitHub deste repositório.
+- Se o config local for de agente, corrigir para a identidade GitHub do dono/configurada do repo antes de commit — nunca inventar autoria falsa.
+- Proibido em mensagens de commit:
+  - `Co-authored-by` / `Co-Authored-By` atribuindo agentes
+  - `Signed-off-by` de agentes
+  - qualquer trailer de colaboração que credite Cursor/agentes
+  - `--trailer` ou rodapés que creditem Cursor/agentes
+
+## PRs e evidências
+
+- Ao abrir PR, preencher `.github/PULL_REQUEST_TEMPLATE.md`.
+- Mudança com impacto visual na UI: colar screenshots e/ou gravações na seção **Evidências** da descrição do PR (não só no chat).
+- Sem impacto visual: marcar N/A na seção de evidências e preencher o restante do template.
