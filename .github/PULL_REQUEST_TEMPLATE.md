@@ -15,6 +15,7 @@
 
 > **Obrigatório** quando a mudança é visível na UI ou houver qualquer prova visual.
 > Cole screenshots e/ou vídeos **nesta descrição do PR** (não só no chat).
+> **Não** commitar evidências no repositório — só embedar na descrição.
 
 <!-- Cole as imagens/vídeos abaixo. Exemplo: -->
 <!-- ![antes](...) -->

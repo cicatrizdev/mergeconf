@@ -19,5 +19,6 @@ alwaysApply: true
 ## PRs e evidências
 
 - Ao abrir PR, preencher `.github/PULL_REQUEST_TEMPLATE.md`.
+- Nunca commitar screenshots, vídeos ou outros arquivos de evidência no repositório (ex.: `.github/pr-evidence/`). Embedar só na descrição do PR.
 - Mudança com impacto visual na UI: colar screenshots e/ou gravações na seção **Evidências** da descrição do PR (não só no chat).
 - Sem impacto visual: marcar N/A na seção de evidências e preencher o restante do template.
