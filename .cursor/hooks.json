@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "hooks": {
+    "sessionStart": [
+      {
+        "command": "python3 .cursor/hooks/ensure-no-cursor-coauthor.py"
+      }
+    ],
+    "beforeShellExecution": [
+      {
+        "command": "python3 .cursor/hooks/ensure-no-cursor-coauthor.py"
+      }
+    ]
+  }
+}

@@ -1,0 +1,38 @@
+#!/bin/sh
+# Strip Cursor Co-authored-by trailers injected by Cursor's prepare-commit-msg.
+#
+# Git order: prepare-commit-msg (Cursor appends the trailer) → commit-msg
+# (this hook removes it) → the commit is created. Human Co-authored-by
+# lines are kept. The commit still succeeds.
+#
+# Install once per clone (no git config / core.hooksPath):
+#   cp .githooks/commit-msg "$(git rev-parse --git-path hooks)/commit-msg"
+# Opening the project in Cursor also copies this file into .git/hooks.
+# Do not skip hooks (--no-verify / -n).
+
+msg_file=$1
+if [ -z "$msg_file" ] || [ ! -f "$msg_file" ]; then
+  exit 0
+fi
+
+tmp=$(mktemp "${TMPDIR:-/tmp}/commit-msg.XXXXXX") || exit 1
+
+awk '
+{
+  raw = $0
+  gsub(/\r$/, "", raw)
+  line = tolower(raw)
+  if (line ~ /^[ \t]*co-authored-by:[ \t]/) {
+    if (index(line, "cursoragent") > 0) next
+    if (index(line, "@cursor.com") > 0) next
+    if (line ~ /co-authored-by:[ \t]*cursor([ \t]+agent)?[ \t]*</) next
+  }
+  print raw
+}
+' "$msg_file" > "$tmp" || {
+  rm -f "$tmp"
+  exit 1
+}
+
+mv "$tmp" "$msg_file"
+exit 0
