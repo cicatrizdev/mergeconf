@@ -1,0 +1,8 @@
+---
+description: Commits sem Cursor como co-author
+alwaysApply: true
+---
+
+# Git
+
+Não incluir Cursor como co-author. O trailer `Co-authored-by: Cursor <cursoragent@cursor.com>` é removido pelo hook `commit-msg` em `.githooks/commit-msg` (roda depois do `prepare-commit-msg` do agente). Não usar `--no-verify`.
