@@ -17,11 +17,11 @@ export default function App() {
   return (
     <div className="min-h-screen">
       <header className="sticky top-0 z-10 border-b border-zinc-200 bg-white/90 backdrop-blur">
-        <div className="mx-auto flex h-14 max-w-5xl items-center gap-6 px-4">
-          <NavLink to="/" className="text-lg font-bold tracking-tight">
+        <div className="mx-auto flex h-14 max-w-5xl items-center gap-3 px-4 sm:gap-6">
+          <NavLink to="/" className="shrink-0 text-lg font-bold tracking-tight">
             Merge<span className="text-conf">Conf</span>
           </NavLink>
-          <nav className="flex items-center gap-4">
+          <nav className="flex items-center gap-3 sm:gap-4">
             <NavLink to="/" className={linkClasse} end>
               Grade
             </NavLink>
@@ -34,11 +34,12 @@ export default function App() {
           </nav>
           <Button
             variant="outline"
-            className="ml-auto"
+            className="ml-auto shrink-0 px-2 sm:px-4"
+            aria-label="Minha Agenda"
             onClick={() => setAgendaAberta((aberta) => !aberta)}
           >
             <CalendarDays className="size-4" aria-hidden />
-            Minha Agenda
+            <span className="hidden sm:inline">Minha Agenda</span>
           </Button>
         </div>
       </header>
