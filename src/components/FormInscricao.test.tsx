@@ -49,20 +49,56 @@ describe('FormInscricao', () => {
     vi.clearAllMocks()
   })
 
+  it('renderiza labels associadas aos campos de nome e e-mail', () => {
+    const palestra = criarPalestra('00000000-0000-0000-0000-000000000800')
+    render(<FormInscricao palestra={palestra} />)
+
+    expect(screen.getByLabelText('Nome')).toBeInTheDocument()
+    expect(screen.getByLabelText('E-mail')).toBeInTheDocument()
+  })
+
+  it('renderiza botão de enviar como button real acessível por teclado', () => {
+    const palestra = criarPalestra('00000000-0000-0000-0000-000000000800')
+    render(<FormInscricao palestra={palestra} />)
+
+    const botao = screen.getByRole('button', { name: 'Inscrever-se' })
+    expect(botao.tagName).toBe('BUTTON')
+    expect(botao).toBeEnabled()
+  })
+
+  it('anuncia erros para leitores de tela com role alert', async () => {
+    const palestra = criarPalestra('00000000-0000-0000-0000-000000000800')
+    vi.mocked(buscarInscricoes).mockResolvedValue([])
+    vi.mocked(inscrever).mockRejectedValue(new Error('Erro de rede'))
+
+    render(<FormInscricao palestra={palestra} />)
+
+    fireEvent.change(screen.getByLabelText('Nome'), { target: { value: 'Ana Dev' } })
+    fireEvent.change(screen.getByLabelText('E-mail'), { target: { value: 'ana@x.dev' } })
+    fireEvent.click(screen.getByRole('button', { name: 'Inscrever-se' }))
+
+    await waitFor(() => {
+      const alerta = screen.getByRole('alert')
+      expect(alerta).toHaveTextContent('Erro de rede')
+    })
+  })
+
   it('mostra "já inscrito" a partir da API mesmo com localStorage vazio', async () => {
     const palestra = criarPalestra('00000000-0000-0000-0000-000000000801')
-    // a API guarda o e-mail normalizado; o usuário digita com maiúsculas
     vi.mocked(buscarInscricoes).mockResolvedValue([inscricaoDe(palestra, 'ana@x.dev')])
 
     render(<FormInscricao palestra={palestra} />)
 
-    const campoEmail = screen.getByPlaceholderText('Seu e-mail')
+    const campoEmail = screen.getByLabelText('E-mail')
     fireEvent.change(campoEmail, { target: { value: 'Ana@x.dev' } })
     fireEvent.blur(campoEmail)
 
-    await waitFor(() => expect(screen.getByText('Você já está inscrito')).toBeInTheDocument())
+    await waitFor(() => {
+      const botao = screen.getByRole('button', { name: 'Você já está inscrito' })
+      expect(botao).toBeDisabled()
+    })
 
-    fireEvent.click(screen.getByText('Você já está inscrito'))
+    fireEvent.click(screen.getByRole('button', { name: 'Você já está inscrito' }))
     expect(inscrever).not.toHaveBeenCalled()
   })
 
@@ -75,11 +111,11 @@ describe('FormInscricao', () => {
 
     render(<FormInscricao palestra={palestra} />)
 
-    fireEvent.change(screen.getByPlaceholderText('Seu nome'), { target: { value: 'Ana Dev' } })
-    fireEvent.change(screen.getByPlaceholderText('Seu e-mail'), { target: { value: 'Ana@x.dev' } })
-    fireEvent.click(screen.getByText('Inscrever-se'))
+    fireEvent.change(screen.getByLabelText('Nome'), { target: { value: 'Ana Dev' } })
+    fireEvent.change(screen.getByLabelText('E-mail'), { target: { value: 'Ana@x.dev' } })
+    fireEvent.click(screen.getByRole('button', { name: 'Inscrever-se' }))
 
-    await waitFor(() => expect(screen.getByText('Você já está inscrito')).toBeInTheDocument())
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Você já está inscrito' })).toBeDisabled())
     expect(screen.queryByText('Você já está inscrito nesta palestra')).not.toBeInTheDocument()
   })
 
@@ -89,7 +125,7 @@ describe('FormInscricao', () => {
 
     render(<FormInscricao palestra={palestra} />)
 
-    expect(screen.getByText('Entrar na lista de espera')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Entrar na lista de espera' })).toBeInTheDocument()
   })
 
   it('mostra a posição após entrar na lista de espera', async () => {
@@ -104,9 +140,9 @@ describe('FormInscricao', () => {
 
     render(<FormInscricao palestra={palestra} />)
 
-    fireEvent.change(screen.getByPlaceholderText('Seu nome'), { target: { value: 'Ana Dev' } })
-    fireEvent.change(screen.getByPlaceholderText('Seu e-mail'), { target: { value: 'Ana@x.dev' } })
-    fireEvent.click(screen.getByText('Entrar na lista de espera'))
+    fireEvent.change(screen.getByLabelText('Nome'), { target: { value: 'Ana Dev' } })
+    fireEvent.change(screen.getByLabelText('E-mail'), { target: { value: 'Ana@x.dev' } })
+    fireEvent.click(screen.getByRole('button', { name: 'Entrar na lista de espera' }))
 
     await waitFor(() =>
       expect(screen.getByText('Você entrou na lista de espera · posição 3')).toBeInTheDocument(),
@@ -122,16 +158,16 @@ describe('FormInscricao', () => {
 
     render(<FormInscricao palestra={palestra} />)
 
-    const campoEmail = screen.getByPlaceholderText('Seu e-mail')
+    const campoEmail = screen.getByLabelText('E-mail')
     fireEvent.change(campoEmail, { target: { value: 'Ana@x.dev' } })
     fireEvent.blur(campoEmail)
 
     await waitFor(() =>
       expect(screen.getByText('Você está na lista de espera · posição 2')).toBeInTheDocument(),
     )
-    fireEvent.click(screen.getByText('Sair da fila'))
+    fireEvent.click(screen.getByRole('button', { name: 'Sair da fila' }))
 
     await waitFor(() => expect(cancelarInscricao).toHaveBeenCalledWith(inscricaoDe(palestra, 'ana@x.dev').id))
-    expect(screen.getByText('Inscrever-se')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Inscrever-se' })).toBeInTheDocument()
   })
 })
