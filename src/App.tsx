@@ -12,7 +12,7 @@ const linkClasse = ({ isActive }: { isActive: boolean }) =>
   `text-sm font-medium transition-colors ${isActive ? 'text-conf' : 'text-zinc-600 hover:text-zinc-900'}`
 
 export default function App() {
-  const [agendaAberta, setAgendaAberta] = useState(false)
+  const [agendaAberta, setAgendaAberta] = useState(false);
 
   return (
     <div className="min-h-screen">
