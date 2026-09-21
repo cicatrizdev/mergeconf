@@ -7,9 +7,10 @@ import { Grade } from './pages/Grade'
 import { PalestraDetalhe } from './pages/PalestraDetalhe'
 import { CheckIn } from './pages/CheckIn'
 import { Organizador } from './pages/Organizador'
+import { MinhaAgenda } from './pages/MinhaAgenda'
 
 const linkClasse = ({ isActive }: { isActive: boolean }) =>
-  `text-sm font-medium transition-colors ${isActive ? 'text-conf' : 'text-zinc-600 hover:text-zinc-900'}`
+  `whitespace-nowrap text-sm font-medium transition-colors ${isActive ? 'text-conf' : 'text-zinc-600 hover:text-zinc-900'}`
 
 export default function App() {
   const [agendaAberta, setAgendaAberta] = useState(false);
@@ -17,11 +18,11 @@ export default function App() {
   return (
     <div className="min-h-screen">
       <header className="sticky top-0 z-10 border-b border-zinc-200 bg-white/90 backdrop-blur">
-        <div className="mx-auto flex h-14 max-w-5xl items-center gap-3 px-4 sm:gap-6">
+        <div className="mx-auto flex min-h-14 max-w-5xl items-center gap-2 px-4 py-2 sm:h-14 sm:gap-6 sm:py-0">
           <NavLink to="/" className="shrink-0 text-lg font-bold tracking-tight">
             Merge<span className="text-conf">Conf</span>
           </NavLink>
-          <nav className="flex items-center gap-3 sm:gap-4">
+          <nav className="flex min-w-0 flex-1 flex-wrap items-center gap-x-2 gap-y-1 sm:flex-nowrap sm:gap-4">
             <NavLink to="/" className={linkClasse} end>
               Grade
             </NavLink>
@@ -30,6 +31,9 @@ export default function App() {
             </NavLink>
             <NavLink to="/organizador" className={linkClasse}>
               Organizador
+            </NavLink>
+            <NavLink to="/minha-agenda" className={linkClasse}>
+              Minha Agenda
             </NavLink>
           </nav>
           <Button
@@ -50,6 +54,7 @@ export default function App() {
           <Route path="/palestra/:id" element={<PalestraDetalhe />} />
           <Route path="/checkin" element={<CheckIn />} />
           <Route path="/organizador" element={<Organizador />} />
+          <Route path="/minha-agenda" element={<MinhaAgenda />} />
         </Routes>
       </main>
 
