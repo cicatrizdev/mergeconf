@@ -7,6 +7,7 @@ import { Grade } from './pages/Grade'
 import { PalestraDetalhe } from './pages/PalestraDetalhe'
 import { CheckIn } from './pages/CheckIn'
 import { Organizador } from './pages/Organizador'
+import { MinhaAgenda } from './pages/MinhaAgenda'
 
 const linkClasse = ({ isActive }: { isActive: boolean }) =>
   `text-sm font-medium transition-colors ${isActive ? 'text-conf' : 'text-zinc-600 hover:text-zinc-900'}`
@@ -31,6 +32,9 @@ export default function App() {
             <NavLink to="/organizador" className={linkClasse}>
               Organizador
             </NavLink>
+            <NavLink to="/minha-agenda" className={linkClasse}>
+              Minha Agenda
+            </NavLink>
           </nav>
           <Button
             variant="outline"
@@ -50,6 +54,7 @@ export default function App() {
           <Route path="/palestra/:id" element={<PalestraDetalhe />} />
           <Route path="/checkin" element={<CheckIn />} />
           <Route path="/organizador" element={<Organizador />} />
+          <Route path="/minha-agenda" element={<MinhaAgenda />} />
         </Routes>
       </main>
 
