@@ -72,13 +72,17 @@ async function mockListarPalestras(resultado: Palestra[] | Promise<Palestra[]>) 
   }
 }
 
-async function renderizarPagina() {
+async function renderizarPagina(aguardarCarregamento = true) {
   const { MinhaAgenda } = await import('./MinhaAgenda')
-  return render(
+  const view = render(
     <MemoryRouter>
       <MinhaAgenda />
     </MemoryRouter>,
   )
+  if (aguardarCarregamento) {
+    await screen.findByRole('heading', { name: 'Minha Agenda' })
+  }
+  return view
 }
 
 describe('MinhaAgenda', () => {
@@ -107,7 +111,7 @@ describe('MinhaAgenda', () => {
       }),
     )
 
-    await renderizarPagina()
+    await renderizarPagina(false)
 
     expect(screen.getByText('Carregando agenda…')).toBeInTheDocument()
 
