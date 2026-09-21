@@ -94,7 +94,7 @@ export function FormInscricao({ palestra }: { palestra: Palestra }) {
   if (estado === 'sucesso') {
     const espera = inscricaoExibida?.status === 'em-espera'
     return (
-      <p className={`text-sm font-medium ${espera ? 'text-amber-600' : 'text-emerald-600'}`}>{mensagem}</p>
+      <p role="status" aria-live="polite" className={`text-sm font-medium ${espera ? 'text-amber-600' : 'text-emerald-600'}`}>{mensagem}</p>
     )
   }
 
@@ -107,38 +107,57 @@ export function FormInscricao({ palestra }: { palestra: Palestra }) {
         : 'Inscrever-se'
 
   return (
-    <div className="flex max-w-sm flex-col gap-3">
-      <Input placeholder="Seu nome" value={nome} onChange={(e) => setNome(e.target.value)} />
-      <Input
-        placeholder="Seu e-mail"
-        value={email}
-        onChange={(e) => {
-          setEmail(e.target.value)
-          setInscricaoAtual(null)
-        }}
-        onBlur={verificarInscricao}
-      />
-      {estado === 'erro' && <p className="text-sm text-red-600">{mensagem}</p>}
+    <form
+      className="flex max-w-sm flex-col gap-3"
+      onSubmit={(e) => {
+        e.preventDefault()
+        enviar()
+      }}
+      noValidate
+    >
+      <div className="flex flex-col gap-1">
+        <label htmlFor="inscricao-nome" className="text-sm font-medium text-zinc-700">
+          Nome
+        </label>
+        <Input id="inscricao-nome" placeholder="Seu nome" value={nome} onChange={(e) => setNome(e.target.value)} />
+      </div>
+      <div className="flex flex-col gap-1">
+        <label htmlFor="inscricao-email" className="text-sm font-medium text-zinc-700">
+          E-mail
+        </label>
+        <Input
+          id="inscricao-email"
+          type="email"
+          placeholder="Seu e-mail"
+          value={email}
+          onChange={(e) => {
+            setEmail(e.target.value)
+            setInscricaoAtual(null)
+          }}
+          onBlur={verificarInscricao}
+        />
+      </div>
+      {estado === 'erro' && <p role="alert" className="text-sm text-red-600">{mensagem}</p>}
       {inscricaoExibida?.status === 'em-espera' ? (
         <>
-          <p className="text-sm text-amber-700">
+          <p role="status" aria-live="polite" className="text-sm text-amber-700">
             Você está na lista de espera · posição {inscricaoExibida.posicaoFila}
           </p>
-          <Button variant="outline" onClick={sairDaFila}>
+          <Button type="button" variant="outline" onClick={sairDaFila}>
             Sair da fila
           </Button>
         </>
       ) : (
-        <div
+        <button
+          type="submit"
+          disabled={jaInscrito || estado === 'enviando'}
           className={
-            'flex h-9 cursor-pointer items-center justify-center rounded-md bg-conf px-4 text-sm font-medium text-white hover:bg-violet-700 ' +
-            (jaInscrito || estado === 'enviando' ? 'pointer-events-none opacity-50' : '')
+            'flex h-9 cursor-pointer items-center justify-center rounded-md bg-conf px-4 text-sm font-medium text-white transition-colors hover:bg-violet-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-conf disabled:pointer-events-none disabled:opacity-50'
           }
-          onClick={enviar}
         >
           {rotulo}
-        </div>
+        </button>
       )}
-    </div>
+    </form>
   )
 }

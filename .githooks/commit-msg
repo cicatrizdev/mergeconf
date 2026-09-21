@@ -10,6 +10,23 @@
 # Opening the project in Cursor also copies this file into .git/hooks.
 # Do not skip hooks (--no-verify / -n).
 
+## ── Bloqueia commits com identidade de agente ────────────────────────
+author_name=$(git config user.name 2>/dev/null || true)
+author_email=$(git config user.email 2>/dev/null || true)
+
+case "$(printf '%s\n' "$author_name" "$author_email" | tr '[:upper:]' '[:lower:]')" in
+  *cursoragent*|*cursor\ agent*|*@cursor.com*)
+    printf '\n\033[1;31m✘ commit bloqueado: identidade de agente detectada\033[0m\n' >&2
+    printf '  user.name  = %s\n' "$author_name" >&2
+    printf '  user.email = %s\n\n' "$author_email" >&2
+    printf 'Corrija antes de commitar:\n' >&2
+    printf '  git config user.name  "Nome Sobrenome"\n' >&2
+    printf '  git config user.email "seu@email"\n\n' >&2
+    exit 1
+    ;;
+esac
+## ─────────────────────────────────────────────────────────────────────
+
 msg_file=$1
 if [ -z "$msg_file" ] || [ ! -f "$msg_file" ]; then
   exit 0
